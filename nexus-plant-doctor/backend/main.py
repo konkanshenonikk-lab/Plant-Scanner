@@ -204,11 +204,14 @@ def build_identification(stats: dict, best: dict, trust: dict, data: bytes) -> d
         "note_params": {},
     }
 
+# The SPA is served from this same origin in production, and Vite proxies
+# /api -> :8000 in dev, so cross-origin access is never needed. An earlier
+# wildcard ("*") + credentials allowed ANY website to read responses from
+# this server - which mattered because of the file-serving bug fixed below.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -329,8 +332,15 @@ if FRONTEND_DIST.exists():
     @app.get("/", include_in_schema=False)
     @app.get("/{path:path}", include_in_schema=False)
     async def serve_frontend(path: str = ""):
-        candidate = FRONTEND_DIST / path
-        if path and candidate.is_file():
+        # Resolve and CONFINE to dist/: without this check a request like
+        # /..%2f..%2fbackend%2fmain.py served any file on disk (and CORS "*"
+        # let any webpage read it). Escapes fall through to index.html.
+        try:
+            candidate = (FRONTEND_DIST / path).resolve()
+            candidate.relative_to(FRONTEND_DIST.resolve())
+        except (ValueError, OSError):
+            candidate = None
+        if path and candidate is not None and candidate.is_file():
             return FileResponse(candidate)
         return FileResponse(FRONTEND_DIST / "index.html")
 
