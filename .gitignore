@@ -1,0 +1,24 @@
+# --- dependencies & build output ---
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+
+# --- other projects in this workspace (not part of this repo) ---
+Plant-Disease-Detection-main/
+Plant-Doctor-main/
+nexus-animate/
+
+# --- secrets / local config ---
+.env
+.env.*
+
+# --- editor & OS junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- logs & scratch ---
+*.log
+npm-debug.log*

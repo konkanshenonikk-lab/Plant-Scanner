@@ -1,0 +1,16 @@
+# Nexus Plant Doctor - backend dependencies
+# Python 3.14 is used on this machine; TensorFlow does NOT support 3.14,
+# so the CNN runs on Keras 3 with the PyTorch backend (CUDA if available).
+
+keras>=3.10
+torch>=2.9
+torchvision>=0.24
+numpy>=2.0
+pillow>=11.0
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart>=0.0.9
+
+# Second-opinion model (PlantDoc ViT from Hugging Face)
+transformers>=4.50
+huggingface_hub>=0.30
